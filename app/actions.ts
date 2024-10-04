@@ -52,10 +52,48 @@ export const signInAction = async (formData: FormData) => {
   return redirect("/protected");
 };
 
-
-
 export const signOutAction = async () => {
   const supabase = createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
+};
+
+export const resetPasswordAction = async (formData: FormData) => {
+  const email = formData.get("email") as string;
+  const origin = headers().get("origin");
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?redirect_to=/change-password`,
+  });
+
+  if (error) {
+    return encodedRedirect("error", "/password-reset", error.message);
+  }
+
+  return encodedRedirect(
+    "success",
+    "/password-reset",
+    "Password reset link sent. Please check your email."
+  );
+};
+
+export const changePasswordAction = async (formData: FormData) => {
+  const newPassword = formData.get("new-password") as string;
+  const confirmPassword = formData.get("confirm-password") as string;
+  const supabase = createClient();
+
+  if (newPassword !== confirmPassword) {
+    return encodedRedirect("error", "/change-password", "Passwords do not match.");
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    return encodedRedirect("error", "/change-password", error.message);
+  }
+
+  return encodedRedirect("success", "/change-password", "Password changed successfully.");
 };

@@ -15,6 +15,12 @@ export default function Login({ searchParams }: { searchParams: Message }) {
           Sign up
         </Link>
       </p>
+      <p className="text-sm text-foreground">
+        Forgot password?{" "}
+        <Link className="text-foreground font-medium underline" href="/password-reset">
+          Reset password
+        </Link>
+      </p>
       <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
         <Label htmlFor="email">Email</Label>
         <Input name="email" placeholder="you@example.com" required />
